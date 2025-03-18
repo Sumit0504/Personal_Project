@@ -4,9 +4,17 @@
     --accent: #6c8b45;
 }
 body { background: #f8fafc; font-family: 'Inter', sans-serif; }
-.gradient-header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 4rem 0; margin-bottom: 2rem; }
+.gradient-header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 4rem 0; margin-bottom: 1.5rem; }
 .upload-container { max-width: 720px; margin: 0 auto; padding: 2.5rem; background: white; border-radius: 1.5rem; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
 .custom-file-upload { border: 2px dashed #cbd5e1; padding: 2rem; text-align: center; cursor: pointer; transition: all 0.3s ease; border-radius: 1rem; background: #f8fafc; }
 .custom-file-upload:hover { border-color: var(--primary); background: #f1f5f9; }
 .submit-btn { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 1rem 2.5rem; border: none; border-radius: 0.75rem; transition: all 0.3s ease; font-size: 1.1rem; }
 .submit-btn:hover { transform: translateY(-2px); }
+#navb{display: flex; justify-content: space-evenly; padding-right: 11.5rem; text-align: center; }
+a{
+    display: inline-block;
+    color: white;
+    text-decoration: wavy;
+    font-size: 1.1rem;
+    
+}
