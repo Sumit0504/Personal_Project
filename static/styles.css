@@ -1,270 +1,293 @@
+/* Use Google Font */
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
 /* Soothing Color Scheme - Light Mode */
 :root {
-    --primary-color: #5A7D9A;       /* Muted soothing blue */
-    --secondary-color: #F4F7F9;     /* Soft off-white background */
-    --accent-color: #A3BFD9;        /* Light blue accent */
-    --text-color: #333333;          /* Dark text for readability */
-    --light-color: #FFFFFF;         /* White for containers */
-    --header-bg: linear-gradient(135deg, #5A7D9A, #A3BFD9);
-  }
-  
-  /* Dark Mode Overrides */
-  body.dark-mode {
-    --primary-color: #7893A8;       /* Slightly lighter blue for dark mode */
-    --secondary-color: #2E3A46;     /* Deep cool blue-gray background */
-    --accent-color: #A3BFD9;        /* Accent can remain similar for contrast */
-    --text-color: #D3D3D3;          /* Light text color */
-    --light-color: #3A4A56;         /* Darker container background */
-    --header-bg: linear-gradient(135deg, #7893A8, #A3BFD9);
-  }
-  
-  /* Basic Reset */
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  /* Body Styling */
-  body {
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    background: var(--secondary-color);
-    color: var(--text-color);
-    line-height: 1.6;
-  }
-  
-  /* Gradient Header Styling */
-  .site-header {
-    background: var(--header-bg);
-    color: var(--light-color);
-    padding: 1rem 0;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-  }
-  
-  .header-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  
-  .logo h1 {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: bold;
-  }
-  
-  .logo .tagline {
-    font-size: 0.9rem;
-    margin: 0;
-    color: var(--light-color);
-    opacity: 0.8;
-  }
-  
-  .header-nav a {
-    margin: 0 0.75rem;
-    color: var(--light-color);
-    text-decoration: none;
-    font-size: 1rem;
-    transition: color 0.3s ease;
-  }
-  
-  .header-nav a:hover {
-    color: var(--accent-color);
-  }
-  
-  .header-toggle .toggle-btn {
-    background: var(--accent-color);
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    color: var(--light-color);
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-  
-  .header-toggle .toggle-btn:hover {
-    background: var(--primary-color);
-  }
-  
-  /* Night Mode Toggle Styling */
-  /* Toggle container */
+  --primary-color: #5A7D9A;       /* Muted soothing blue */
+  --secondary-color: #F4F7F9;     /* Soft off-white background */
+  --accent-color: #A3BFD9;        /* Light blue accent */
+  --text-color: #333333;          /* Dark text for readability */
+  --light-color: #FFFFFF;         /* White for containers */
+  --header-bg: linear-gradient(135deg, #5A7D9A, #A3BFD9);
+}
+
+/* Dark Mode Overrides */
+body.dark-mode {
+  --primary-color: #7893A8;
+  --secondary-color: #2E3A46;
+  --accent-color: #A3BFD9;
+  --text-color: #D3D3D3;
+  --light-color: #3A4A56;
+  --header-bg: linear-gradient(135deg, #7893A8, #A3BFD9);
+}
+
+/* Basic Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body Styling */
+body {
+  background: var(--secondary-color);
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+/* Header & Navigation */
+.site-header {
+  background: var(--header-bg);
+  color: var(--light-color);
+  padding: 1rem 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.logo .tagline {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.header-nav a {
+  margin: 0 0.75rem;
+  color: var(--light-color);
+  text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.4s ease;
+}
+
+.header-nav a:hover,
+.footer-nav a:hover {
+  color: var(--accent-color);
+}
+
+/* Custom Night Mode Toggle Switch */
 .toggle-container {
-    position: relative;
-    width: 120px;
-    height: 60px;
-    display: inline-block;
-  }
-  
-  /* Hide the checkbox */
-  .toggle-container input {
-    opacity: 0;
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    z-index: 2;
-    cursor: pointer;
-  }
-  
-  /* Label styled as the toggle background */
-  .toggle-container label {
-    display: block;
-    width: 100%;
-    height: 100%;
-    border-radius: 30px;
-    border: 4px solid rgba(90, 79, 136, 0.2);
-    background: url("https://cdn-icons-png.flaticon.com/512/869/869869.png") no-repeat center;
-    background-size: 40%;
-    transition: all 0.3s ease;
-    position: relative;
-  }
-  
-  /* The sliding knob */
-  .toggle-container label::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 4px;
-    transform: translate(0, -50%);
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: #ffd700; /* A warm sun color */
-    border: 2px solid rgba(90, 79, 136, 0.2);
-    transition: all 0.3s ease;
-  }
-  
-  /* When checkbox is checked, update label and knob styling */
-  .toggle-container input:checked ~ label {
-    background: url("https://cdn-icons-png.flaticon.com/512/1164/1164954.png") no-repeat center;
-    background-size: 40%;
-  }
-  
-  .toggle-container input:checked ~ label::after {
-    left: calc(100% - 4px - 52px); /* Moves the knob to the right */
-    background: #777ba5; /* A cool moon color */
-  }
-  
-  
-  /* Section Container Styling */
-  .upload-container {
-    background: var(--light-color);
-    border-radius: 8px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    animation: fadeInUp 0.8s ease-out;
-  }
-  
-  .upload-container h4 {
-    margin-bottom: 1.5rem;
-    text-align: center;
-    color: var(--primary-color);
-  }
-  
-  /* Custom File Upload Styling */
-  .custom-file-upload {
-    border: 2px dashed var(--primary-color);
-    padding: 2rem;
-    text-align: center;
-    cursor: pointer;
-    transition: background 0.3s ease, border-color 0.3s ease;
-    border-radius: 8px;
-  }
-  
-  .custom-file-upload:hover {
-    background: var(--primary-color);
-    color: var(--light-color);
-    border-color: var(--accent-color);
-  }
-  
-  .file-prompt {
-    font-size: 1rem;
-    margin: 0;
-  }
-  
-  .file-name {
-    font-weight: bold;
-    margin-left: 0.5rem;
-  }
-  
-  /* Filename Input Styling */
-  .filename-input label {
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-  }
-  
-  .filename-input input {
-    border: 1px solid #ccc;
-    padding: 0.5rem;
-    border-radius: 4px;
-  }
-  
-  /* Submit Button Styling */
-  .submit-btn {
-    background: var(--primary-color);
-    color: var(--light-color);
-    border: none;
-    padding: 0.75rem;
-    border-radius: 4px;
-    font-size: 1rem;
-    transition: background 0.3s ease;
-  }
-  
-  .submit-btn:hover {
-    background: var(--accent-color);
-  }
-
-.try-now-btn {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    padding: 0.8rem 2rem;
-    font-size: 1.2rem;
-    border-radius: 0.75rem;
-    text-decoration: none;
-    display: inline-block;
-    transition: all 0.3s ease;
+  position: relative;
+  width: 120px;
+  height: 60px;
+  display: inline-block;
 }
 
-.try-now-btn:hover {
-    transform: translateY(-2px);
+.toggle-container input {
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 2;
+  cursor: pointer;
 }
 
-  
-  /* About Us Section */
-  .about-header {
-    color: var(--primary-color);
-    text-align: center;
-    margin-bottom: 1rem;
-  }
-  
-  .about-description {
-    text-align: center;
-    margin-bottom: 1rem;
-    font-size: 1.1rem;
-  }
-  
-  .feature-list {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .feature-list li {
-    margin: 0.75rem 0;
-    display: flex;
-    align-items: center;
-    font-size: 1rem;
-  }
-  
-  .feature-list li i {
-    color: var(--accent-color);
-    margin-right: 0.5rem;
-  }
-  
-  /* Footer Styling */
-  .site-footer {
+.toggle-container label {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 30px;
+  border: 4px solid rgba(90, 79, 136, 0.2);
+  background: url("https://cdn-icons-png.flaticon.com/512/869/869869.png") no-repeat center;
+  background-size: 40%;
+  transition: all 0.4s ease;
+  position: relative;
+}
+
+.toggle-container label::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 4px;
+  transform: translate(0, -50%);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #ffd700;
+  border: 2px solid rgba(90, 79, 136, 0.2);
+  transition: all 0.4s ease;
+}
+
+.toggle-container input:checked ~ label {
+  background: url("https://cdn-icons-png.flaticon.com/512/1164/1164954.png") no-repeat center;
+  background-size: 40%;
+}
+
+.toggle-container input:checked ~ label::after {
+  left: calc(100% - 4px - 52px);
+  background: #777ba5;
+}
+
+/* Hero Section with Background Image */
+.hero {
+  position: relative;
+  padding: 4rem 1rem;
+  color: var(--light-color);
+  text-align: center;
+  background: url("https://source.unsplash.com/featured/?office,work") no-repeat center center;
+  background-size: cover;
+  overflow: hidden;
+}
+
+.hero::before {
+  /* Optional overlay to darken/lighten the background */
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+.hero-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  transition: opacity 0.4s ease;
+}
+
+.hero-text {
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+  transition: opacity 0.4s ease;
+}
+
+/* Button Styles */
+.try-now-btn,
+.submit-btn {
+  background: var(--primary-color);
+  color: var(--light-color);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: background 0.4s ease, transform 0.4s ease;
+}
+
+.try-now-btn:hover,
+.submit-btn:hover {
+  background: var(--accent-color);
+  transform: translateY(-2px);
+}
+
+/* How It Works Button */
+.how-it-works-btn {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: var(--primary-color);
+  text-decoration: underline;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.4s ease;
+}
+
+.how-it-works-btn:hover {
+  color: var(--accent-color);
+}
+
+/* Upload Container Styling */
+.upload-container {
+  background: var(--light-color);
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  animation: fadeInUp 1s ease-out;
+}
+
+.upload-container h4 {
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: var(--primary-color);
+}
+
+/* Custom File Upload */
+.custom-file-upload {
+  border: 2px dashed var(--primary-color);
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.4s ease, border-color 0.4s ease;
+  border-radius: 8px;
+}
+
+.custom-file-upload:hover {
+  background: var(--primary-color);
+  color: var(--light-color);
+  border-color: var(--accent-color);
+}
+
+.file-prompt {
+  font-size: 1rem;
+}
+
+.file-name {
+  font-weight: bold;
+  margin-left: 0.5rem;
+}
+
+.filename-input label {
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.filename-input input {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+/* About Section */
+.about-header {
+  color: var(--primary-color);
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.about-description {
+  text-align: center;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.feature-list {
+  list-style: none;
+  padding: 0;
+}
+
+.feature-list li {
+  margin: 0.75rem 0;
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+}
+
+.feature-list li i {
+  color: var(--accent-color);
+  margin-right: 0.5rem;
+}
+
+/* Footer Styling */
+.site-footer {
   background: var(--text-color);
   color: var(--light-color);
   padding: 1rem 0;
@@ -279,8 +302,8 @@
 }
 
 .footer-branding h3 {
-  margin: 0;
   font-size: 1.25rem;
+  margin: 0;
 }
 
 .footer-nav a {
@@ -288,22 +311,14 @@
   color: var(--light-color);
   text-decoration: none;
   font-size: 0.9rem;
-  transition: color 0.3s ease;
-}
-
-.footer-nav a:hover {
-  color: var(--accent-color);
+  transition: color 0.4s ease;
 }
 
 .footer-social a {
   margin: 0 0.5rem;
   color: var(--light-color);
   font-size: 1.2rem;
-  transition: color 0.3s ease;
-}
-
-.footer-social a:hover {
-  color: var(--accent-color);
+  transition: color 0.4s ease;
 }
 
 .footer-bottom {
@@ -311,4 +326,34 @@
   padding: 0.5rem 0;
   font-size: 0.8rem;
   text-align: center;
+}
+
+/* Fade-In Animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loader Spinner Overlay using GIF */
+.loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  z-index: 2000;
+  display: none; /* hidden by default */
+  justify-content: center;
+  align-items: center;
+}
+
+.loader-overlay .loader-gif {
+  width: 80px; /* adjust as needed */
 }
