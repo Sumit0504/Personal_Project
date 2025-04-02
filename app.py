@@ -3,9 +3,9 @@ import os
 import pandas as pd
 import uuid
 import re
-from openpyxl import load_workbook
-from openpyxl.styles import Font, PatternFill, Alignment
-from openpyxl.utils import get_column_letter
+from openpyxl import load_workbook # type: ignore
+from openpyxl.styles import Font, PatternFill, Alignment # type: ignore
+from openpyxl.utils import get_column_letter # type: ignore
 
 app = Flask(__name__)
 
@@ -58,7 +58,7 @@ def index():
 
 def process_file(input_path):
     """Process CSV file and return processed DataFrame."""
-    data = pd.read_csv(input_path)
+    data = pd.read_excel(input_path)
 
     # ✅ Fix: Validate required columns
     required_columns = {'DATE_OF_TRAN', 'RPTCODE', 'TRAN_AMT'}
@@ -106,10 +106,10 @@ def compare_files():
 
 def process_comparison(filepath1, filepath2, output_folder):
     """Compare two CSV files and generate Excel reports."""
-    d1 = pd.read_csv(filepath1).sort_values(by='A/c').reset_index(drop=True)
+    d1 = pd.read_excel(filepath1).sort_values(by='A/c').reset_index(drop=True)
     d1['Sno'] = range(1, len(d1) + 1)
 
-    d2 = pd.read_csv(filepath2).sort_values(by='A/c').reset_index(drop=True)
+    d2 = pd.read_excel(filepath2).sort_values(by='A/c').reset_index(drop=True)
     d2['Sno'] = range(1, len(d2) + 1)
 
     d_common = d1.merge(d2, on="A/c", suffixes=('_d1', '_d2'))
