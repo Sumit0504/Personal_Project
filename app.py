@@ -3,9 +3,10 @@ import os
 import pandas as pd
 import uuid
 import re
-from openpyxl import load_workbook # type: ignore
-from openpyxl.styles import Font, PatternFill, Alignment # type: ignore
-from openpyxl.utils import get_column_letter # type: ignore
+
+from openpyxl import load_workbook 
+from openpyxl.styles import Font, PatternFill, Alignment 
+from openpyxl.utils import get_column_letter 
 
 app = Flask(__name__)
 
