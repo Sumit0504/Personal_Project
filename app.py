@@ -4,6 +4,9 @@ import pandas as pd
 import uuid
 import re
 
+import zipfile
+from io import BytesIO
+
 from openpyxl import load_workbook 
 from openpyxl.styles import Font, PatternFill, Alignment 
 from openpyxl.utils import get_column_letter 
@@ -26,18 +29,26 @@ def sanitize_filename(name):
     cleaned = re.sub(r'\s+', '_', cleaned)
     return cleaned[:50] or 'processed_data'
 
+# ✅ Add this utility function to clean numeric columns
+def clean_numeric(column):
+    return pd.to_numeric(
+        column.astype(str)
+        .str.replace(',', '', regex=False)
+        .str.replace(r'[^\d\.\-]', '', regex=True),
+        errors='coerce'
+    ).fillna(0)
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        # ✅ Fix: Match input name in HTML
         file = request.files.get('file_process')  
         custom_name = request.form.get('filename', 'processed_data')
 
         if not file or file.filename == '':
-            return "No file uploaded", 400  # Handle missing file
+            return "No file uploaded", 400
 
-        if not file.filename.endswith('.csv'):
-            return "Only CSV files are allowed", 400
+        if not file.filename.endswith('.xlsx'):
+            return "Only XLSX files are allowed", 400
 
         safe_name = sanitize_filename(custom_name)
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
@@ -49,19 +60,17 @@ def index():
             return f"Error processing file: {str(e)}", 500
 
         unique_id = uuid.uuid4().hex[:8]
-        output_filename = f"temp_{unique_id}.csv"
+        output_filename = f"temp_{unique_id}.xlsx"
         output_path = os.path.join(app.config['PROCESSED_FOLDER'], output_filename)
-        merged_df.to_csv(output_path, index=False)
+        merged_df.to_excel(output_path, index=False)
 
-        return send_file(output_path, as_attachment=True, download_name=f"{safe_name}.csv", mimetype='text/csv')
+        return send_file(output_path, as_attachment=True, download_name=f"{safe_name}.xlsx", mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
     return render_template('index.html')
 
 def process_file(input_path):
-    """Process CSV file and return processed DataFrame."""
     data = pd.read_excel(input_path)
 
-    # ✅ Fix: Validate required columns
     required_columns = {'DATE_OF_TRAN', 'RPTCODE', 'TRAN_AMT'}
     if not required_columns.issubset(data.columns):
         raise ValueError(f"Missing columns: {required_columns - set(data.columns)}")
@@ -88,7 +97,6 @@ def process_file(input_path):
 
 @app.route('/compare', methods=['POST'])
 def compare_files():
-    """Process two CSV files, compare them, and return Excel files."""
     file1 = request.files.get('file1')
     file2 = request.files.get('file2')
 
@@ -103,22 +111,37 @@ def compare_files():
     output_folder = app.config['PROCESSED_FOLDER']
     output_files = process_comparison(filepath1, filepath2, output_folder)
 
-    return send_file(output_files["common"], as_attachment=True, download_name="common.xlsx", mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    # ✅ Create ZIP file
+    zip_buffer = BytesIO()
+    with zipfile.ZipFile(zip_buffer, 'w') as zipf:
+        zipf.write(output_files["common"], arcname="common.xlsx")
+        zipf.write(output_files["only_in_soc"], arcname="only_in_soc.xlsx")
+        zipf.write(output_files["only_in_bk"], arcname="only_in_bk.xlsx")
+
+    zip_buffer.seek(0)
+    return send_file(zip_buffer, as_attachment=True, download_name="comparison_results.zip", mimetype="application/zip")
 
 def process_comparison(filepath1, filepath2, output_folder):
-    """Compare two CSV files and generate Excel reports."""
-    d1 = pd.read_excel(filepath1).sort_values(by='A/c').reset_index(drop=True)
-    d1['Sno'] = range(1, len(d1) + 1)
+    d1 = pd.read_excel(filepath1).sort_values(by='BkAcc').reset_index(drop=True)
+    d1['Slno'] = range(1, len(d1) + 1)
 
-    d2 = pd.read_excel(filepath2).sort_values(by='A/c').reset_index(drop=True)
-    d2['Sno'] = range(1, len(d2) + 1)
+    d2 = pd.read_excel(filepath2).sort_values(by='BkAcc').reset_index(drop=True)
+    d2['Slno'] = range(1, len(d2) + 1)
 
-    d_common = d1.merge(d2, on="A/c", suffixes=('_d1', '_d2'))
-    d_not_common = d1.merge(d2, on="A/c", how="outer", indicator=True)
+    d1['SocBal'] = d1['SocBal'].astype(str)
+    d2['BkBal'] = d2['BkBal'].astype(str)
+
+    d_common = d1.merge(d2, on="BkAcc")
+    d_not_common = d1.merge(d2, on="BkAcc", how="outer", indicator=True)
+    
     only_in_d1 = d_not_common[d_not_common['_merge'] == 'left_only'].drop(columns=['_merge'])
     only_in_d2 = d_not_common[d_not_common['_merge'] == 'right_only'].drop(columns=['_merge'])
 
-    d_common["Difference"] = d_common["ST_d1"] + d_common["ST_d2"]
+    # ✅ Use clean_numeric to fix invalid values
+    d_common['ScoBal'] = clean_numeric(d_common['SocBal'])
+    d_common['BkBal'] = clean_numeric(d_common['BkBal'])
+
+    d_common["Difference"] = d_common["ScoBal"] + d_common["BkBal"]
     d_common = d_common[d_common['Difference'] != 0]
 
     common_path = os.path.join(output_folder, "common.xlsx")
@@ -131,10 +154,9 @@ def process_comparison(filepath1, filepath2, output_folder):
 
     format_excel(common_path, d_common)
 
-    return {"common": common_path, "only_in_d1": only_d1_path, "only_in_d2": only_d2_path}
+    return {"common": common_path, "only_in_soc": only_d1_path, "only_in_bk": only_d2_path}
 
 def format_excel(filepath, df):
-    """Apply styling and formatting to the Excel file."""
     wb = load_workbook(filepath)
     ws = wb.active
 

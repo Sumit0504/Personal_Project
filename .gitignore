@@ -1,1 +1,6 @@
 .venvp1
+*.pyc
+uploads/
+processed/
+*.xlsx
+*.ipynb

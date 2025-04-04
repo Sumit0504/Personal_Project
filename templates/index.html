@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>XLSX Processor & Comparator</title>
+    <title>SheetMorph & Comparator</title>
     <!-- Google Font for premium typography -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
     <!-- Bootstrap CSS -->
@@ -15,7 +15,7 @@
     <header class="site-header" role="banner">
       <div class="header-content container d-flex align-items-center justify-content-between">
         <div class="logo">
-          <h1 tabindex="0">XLSX Processor</h1>
+          <h1 tabindex="0">SheetMorph</h1>
           <p class="tagline" tabindex="0">Simplify Your Data</p>
         </div>
         <nav class="header-nav" aria-label="Main Navigation">
@@ -76,7 +76,7 @@
         <h4 id="process-heading" class="text-center">Process an XLSX File</h4>
         <form action="/" method="POST" enctype="multipart/form-data">
           <label class="custom-file-upload w-100 mb-3" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to upload your file">
-            <input type="file" name="file" accept=".xlsx" required aria-label="Upload XLSX File" />
+            <input type="file" name="file" accept=".xlsx",'.xls' required aria-label="Upload XLSX File" />
             <p class="file-prompt">
               Upload your XLSX file to process <span class="file-name"></span>
             </p>
@@ -102,15 +102,15 @@
         <h4 id="compare-heading" class="text-center">Compare Two XLSX Files</h4>
         <form action="/compare" method="POST" enctype="multipart/form-data">
           <label class="custom-file-upload w-100 mb-3" data-bs-toggle="tooltip" data-bs-placement="top" title="Select the first XLSX file">
-            <input type="file" name="file1" accept=".xlsx" required aria-label="Upload First XLSX File" />
+            <input type="file" name="file1" accept=".xlsx", '.xls' required aria-label="Upload First XLSX File" />
             <p class="file-prompt">
-              Upload First XLSX File <span class="file-name"></span>
+              Upload Society XLSX File <span class="file-name"></span>
             </p>
           </label>
           <label class="custom-file-upload w-100 mb-3" data-bs-toggle="tooltip" data-bs-placement="top" title="Select the second XLSX file">
-            <input type="file" name="file2" accept=".xlsx" required aria-label="Upload Second XLSX File" />
+            <input type="file" name="file2" accept=".xlsx", '.xls' required aria-label="Upload Second XLSX File" />
             <p class="file-prompt">
-              Upload Second XLSX File <span class="file-name"></span>
+              Upload Bank XLSX File <span class="file-name"></span>
             </p>
           </label>
           <button type="submit" class="submit-btn w-100">Compare Files</button>
@@ -119,36 +119,47 @@
 
       <!-- About Us Section -->
       <section id="about" class="upload-container" aria-labelledby="about-heading">
-        <h1 id="about-heading" class="about-header text-center">About Us - XLSX Processor & Comparator</h1>
+        <h1 id="about-heading" class="about-header text-center">About Us - SheetMorph & Comparator</h1>
+        
         <p class="about-description text-center">
-          Welcome to <strong>XLSX Processor & Comparator</strong>, your go-to tool for seamless spreadsheet management.
-          Whether you're analyzing data, handling business records, or verifying data consistency, our tool simplifies it all.
+          <strong>SheetMorph</strong> is a lightweight, web-based tool designed to help professionals and teams streamline their spreadsheet workflows. Whether you're managing financial records, validating data entries, or reconciling bank statements, our tool simplifies the process of cleaning, formatting, and comparing XLSX files with precision.
         </p>
+      
         <ul class="feature-list">
           <li>
             <i class="fas fa-file-excel" aria-hidden="true"></i>
-            <strong>Process XLSX Files:</strong> Upload, clean, and format your XLSX files effortlessly.
+            <strong>Process Excel Files:</strong> Automatically clean, aggregate, and format large datasets with ease.
           </li>
           <li>
             <i class="fas fa-exchange-alt" aria-hidden="true"></i>
-            <strong>Compare XLSX Files:</strong> Quickly detect differences and mismatches between two XLSX files.
+            <strong>Compare Two Files:</strong> Instantly identify differences and mismatches between two spreadsheets with clear, downloadable outputs.
           </li>
           <li>
-            <i class="fas fa-user-check" aria-hidden="true"></i>
-            <strong>User-Friendly Interface:</strong> Intuitive design for smooth and hassle-free file handling.
+            <i class="fas fa-check-circle" aria-hidden="true"></i>
+            <strong>Accurate & Reliable:</strong> Built with robust logic to ensure accurate results — even with messy or inconsistent data.
+          </li>
+          <li>
+            <i class="fas fa-user-friends" aria-hidden="true"></i>
+            <strong>User-Centric Design:</strong> Simple, intuitive interface — no tech skills required.
           </li>
         </ul>
+      
+        <p class="text-center">
+          <em>Developed by Sumit Garg, a Computer Engineering student passionate about data processing, automation, and clean UI/UX design. This tool was built as part of my mission to simplify tedious data handling tasks through code.</em>
+        </p>
+      
         <div class="text-center">
           <a href="#process" class="btn try-now-btn">Try Now 🚀</a>
         </div>
       </section>
+      
     </main>
 
     <!-- Footer -->
     <footer class="site-footer" role="contentinfo">
       <div class="footer-content container d-flex flex-column flex-md-row justify-content-between align-items-center">
         <div class="footer-branding">
-          <h3>XLSX Processor & Comparator</h3>
+          <h3>SheetMorph</h3>
         </div>
         <nav class="footer-nav" aria-label="Footer Navigation">
           <a href="/" aria-label="Home">Home</a>
@@ -164,7 +175,7 @@
         </div>
       </div>
       <div class="footer-bottom text-center">
-        <p>&copy; 2025 XLSX Processor & Comparator. All Rights Reserved.</p>
+        <p>&copy; 2025 SheetMorph . All Rights Reserved.</p>
       </div>
     </footer>
 
