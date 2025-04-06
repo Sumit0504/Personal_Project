@@ -61,6 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  
   // Simulate loader spinner display during form submission.
   const forms = document.querySelectorAll("form");
   forms.forEach(form => {
