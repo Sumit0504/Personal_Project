@@ -7,6 +7,8 @@ import re
 import zipfile
 from io import BytesIO
 
+from flask import request
+
 from openpyxl import load_workbook 
 from openpyxl.styles import Font, PatternFill, Alignment 
 from openpyxl.utils import get_column_letter 
@@ -90,24 +92,28 @@ def index():
     if form.validate_on_submit():
         file = request.files.get('file_process')  
         custom_name = form.filename.data or 'processed_data'
-    
-    return render_template('index.html', form=form)
-    if not file or file.filename == '':
-        return "No file uploaded", 400
-    if not file.filename.endswith('.xlsx'):
-        return "Only XLSX files are allowed", 400
-    safe_name = sanitize_filename(custom_name)
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-    file.save(file_path)
-    try:
-        merged_df = process_file(file_path)
-    except Exception as e:
-        return f"Error processing file: {str(e)}", 500
-    unique_id = uuid.uuid4().hex[:8]
-    output_filename = f"temp_{unique_id}.xlsx"
-    output_path = os.path.join(app.config['PROCESSED_FOLDER'], output_filename)
-    merged_df.to_excel(output_path, index=False)
-    return send_file(output_path, as_attachment=True, download_name=f"{safe_name}.xlsx",mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+        if not file or file.filename == '':
+            return "No file uploaded", 400
+        if not file.filename.endswith('.xlsx'):
+            return "Only XLSX files are allowed", 400
+
+        safe_name = sanitize_filename(custom_name)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+        file.save(file_path)
+
+        try:
+            merged_df = process_file(file_path)
+        except Exception as e:
+            return f"Error processing file: {str(e)}", 500
+
+        unique_id = uuid.uuid4().hex[:8]
+        output_filename = f"temp_{unique_id}.xlsx"
+        output_path = os.path.join(app.config['PROCESSED_FOLDER'], output_filename)
+        merged_df.to_excel(output_path, index=False)
+
+        return send_file(output_path, as_attachment=True, download_name=f"{safe_name}.xlsx",
+                         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
     return render_template('index.html', form=form)
 
@@ -138,6 +144,7 @@ def process_file(input_path):
 
     return pd.concat(final_dfs, ignore_index=True)
 
+@csrf.exempt
 @app.route('/compare', methods=['POST'])
 @login_required
 def compare_files():
