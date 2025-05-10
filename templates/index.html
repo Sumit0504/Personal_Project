@@ -5,32 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SheetMorph & Comparator</title>
     <!-- Google Font for premium typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Custom Stylesheet -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
   </head>
   <body>
     <!-- Header with sticky navigation and custom toggle -->
     <header class="site-header" role="banner">
-      <div class="header-content container d-flex align-items-center justify-content-between">
+      <div class="header-content container d-flex flex-wrap align-items-center justify-content-between">
+        <!-- Logo Section -->
         <div class="logo">
           <h1 tabindex="0">SheetMorph</h1>
           <p class="tagline" tabindex="0">Simplify Your Data</p>
         </div>
-        <nav class="header-nav" aria-label="Main Navigation">
+    
+        <!-- Navigation Links -->
+        <nav class="header-nav d-flex gap-3 flex-wrap align-items-center" aria-label="Main Navigation">
           <a href="#process" class="nav-link" aria-label="Process XLSX File">Process</a>
           <a href="#compare" class="nav-link" aria-label="Compare XLSX Files">Compare</a>
           <a href="#about" class="nav-link" aria-label="About Us">About</a>
         </nav>
-        <!-- Custom Night Mode Toggle Switch -->
-        <div class="toggle-container" aria-label="Toggle Night Mode">
-          <input type="checkbox" id="night-mode-toggle" />
-          <label for="night-mode-toggle" aria-hidden="true"></label>
+    
+        <!-- User Controls: Night Mode + Welcome + Logout -->
+        <div class="d-flex align-items-center gap-3 flex-wrap justify-content-end text-end">
+          <!-- Night Mode Toggle -->
+          <div class="toggle-container" aria-label="Toggle Night Mode">
+            <input type="checkbox" id="night-mode-toggle" />
+            <label for="night-mode-toggle" aria-hidden="true"></label>
+          </div>
+    
+          <!-- Welcome Message + Logout Button --> 
+          {% if current_user.is_authenticated %}
+            <span class="welcome-text fw-medium d-none d-md-inline">Welcome, {{ current_user.username }}</span>
+            <p class="text-end mb-0">
+              <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm">Logout</a>
+            </p>
+          {% endif %}
         </div>
       </div>
     </header>
-
+    
     <!-- Hero Section with background image, CTA and "How It Works" Modal Trigger -->
     <section class="hero container text-center my-5">
       <div class="hero-overlay"></div>
@@ -45,7 +64,7 @@
         </button>
       </div>
     </section>
-
+    
     <!-- How It Works Modal -->
     <div class="modal fade" id="howItWorksModal" tabindex="-1" aria-labelledby="howItWorksModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
@@ -62,61 +81,74 @@
         </div>
       </div>
     </div>
-
+    
     <!-- Main Content -->
     <main class="container">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="mt-3">
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+    
       <!-- Loader Spinner Overlay (hidden by default) -->
       <div id="loader" class="loader-overlay" aria-hidden="true">
-        <!-- Replace the src URL with your preferred loader GIF -->
         <img src="https://media.giphy.com/media/y1ZBcOGOOtlpC/giphy.gif" alt="Loading..." class="loader-gif" />
       </div>
-
-      <!-- File Processing Section -->
+    
+      <!-- File Processing Section --> 
       <section id="process" class="upload-container mb-4" aria-labelledby="process-heading">
         <h4 id="process-heading" class="text-center">Process an XLSX File</h4>
+        {% if current_user.is_authenticated %}
         <form action="/" method="POST" enctype="multipart/form-data">
-          <label class="custom-file-upload w-100 mb-3" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to upload your file">
-            <input type="file" name="file" accept=".xlsx",'.xls' required aria-label="Upload XLSX File" />
-            <p class="file-prompt">
-              Upload your XLSX file to process <span class="file-name"></span>
-            </p>
+          {{ form.hidden_tag() }}
+          <!-- Add file input manually because WTForm doesn't include it -->  
+          <label class="custom-file-upload w-100 mb-3">
+            <input type="file" name="file_process" accept=".xlsx,.xls" required />
+            <p class="file-prompt">Upload your XLSX file <span class="file-name"></span></p>
           </label>
           <div class="filename-input mt-4">
-            <label for="customName" class="form-label d-block fw-medium mb-2">Output Filename</label>
-            <input
-              type="text"
-              id="customName"
-              name="filename"
-              class="form-control"
-              placeholder="Enter file name (without .xlsx)"
-              aria-label="Output Filename"
-            />
+            <label for="customName" class="form-label">Output Filename</label>
+            <!-- Using the FileUploadForm field for filename --> 
+            {{ form.filename(class="form-control", placeholder="Enter file name (without .xlsx)") }}
           </div>
           <br />
-          <button type="submit" class="submit-btn w-100">Process File</button>
+          {{ form.submit(class="submit-btn w-100") }}
         </form>
+        {% else %}
+          <p class="text-center mt-3">Please <a href="{{ url_for('login') }}">Login</a> or <a href="{{ url_for('register') }}">Register</a> to process a file.</p>
+        {% endif %}
       </section>
-
+    
       <!-- File Comparison Section -->
       <section id="compare" class="upload-container mb-4" aria-labelledby="compare-heading">
         <h4 id="compare-heading" class="text-center">Compare Two XLSX Files</h4>
-        <form action="/compare" method="POST" enctype="multipart/form-data">
-          <label class="custom-file-upload w-100 mb-3" data-bs-toggle="tooltip" data-bs-placement="top" title="Select the first XLSX file">
-            <input type="file" name="file1" accept=".xlsx", '.xls' required aria-label="Upload First XLSX File" />
-            <p class="file-prompt">
-              Upload Society XLSX File <span class="file-name"></span>
-            </p>
-          </label>
-          <label class="custom-file-upload w-100 mb-3" data-bs-toggle="tooltip" data-bs-placement="top" title="Select the second XLSX file">
-            <input type="file" name="file2" accept=".xlsx", '.xls' required aria-label="Upload Second XLSX File" />
-            <p class="file-prompt">
-              Upload Bank XLSX File <span class="file-name"></span>
-            </p>
-          </label>
-          <button type="submit" class="submit-btn w-100">Compare Files</button>
-        </form>
+        {% if current_user.is_authenticated %}
+          <form action="/compare" method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <!-- Use a plain HTML form for compare because no WTForm is defined for it --> 
+            <label class="custom-file-upload w-100 mb-3">
+              <input type="file" name="file1" accept=".xlsx,.xls" required />
+              <p class="file-prompt">Upload Society XLSX File <span class="file-name"></span></p>
+            </label>
+            
+            <label class="custom-file-upload w-100 mb-3">
+              <input type="file" name="file2" accept=".xlsx,.xls" required />
+              <p class="file-prompt">Upload Bank XLSX File <span class="file-name"></span></p>
+            </label>
+            <button type="submit" class="submit-btn w-100">Compare Files</button>
+          </form>
+        {% else %}
+          <p class="text-center mt-3">Please <a href="{{ url_for('login') }}">Login</a> or <a href="{{ url_for('register') }}">Register</a> to compare files.</p>
+        {% endif %} 
       </section>
-
+    
       <!-- About Us Section -->
       <section id="about" class="upload-container" aria-labelledby="about-heading">
         <h1 id="about-heading" class="about-header text-center">About Us - SheetMorph & Comparator</h1>
@@ -154,7 +186,7 @@
       </section>
       
     </main>
-
+    
     <!-- Footer -->
     <footer class="site-footer" role="contentinfo">
       <div class="footer-content container d-flex flex-column flex-md-row justify-content-between align-items-center">
@@ -175,15 +207,15 @@
         </div>
       </div>
       <div class="footer-bottom text-center">
-        <p>&copy; 2025 SheetMorph . All Rights Reserved.</p>
+        <p>&copy; 2025 SheetMorph. All Rights Reserved.</p>
       </div>
     </footer>
-
+    
     <!-- FontAwesome Icons -->
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <!-- Bootstrap Bundle JS (for tooltips and modal) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom Script -->
+    <!-- Custom Script for index page -->    
     <script src="{{ url_for('static', filename='script.js') }}"></script>
   </body>
 </html>

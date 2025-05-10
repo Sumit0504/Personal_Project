@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, send_file, redirect, flash
 import os
 import pandas as pd
 import uuid
@@ -7,9 +7,19 @@ import re
 import zipfile
 from io import BytesIO
 
+from flask import request
+
 from openpyxl import load_workbook 
 from openpyxl.styles import Font, PatternFill, Alignment 
 from openpyxl.utils import get_column_letter 
+
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired, Length
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_wtf.csrf import CSRFProtect
+from flask import url_for
 
 app = Flask(__name__)
 
@@ -18,10 +28,44 @@ UPLOAD_FOLDER = 'uploads'
 PROCESSED_FOLDER = 'processed'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['PROCESSED_FOLDER'] = PROCESSED_FOLDER
+app.secret_key = 'your_very_secure_secret_key_here'  # Replace with a strong secret key
 
 # Ensure the folders exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(PROCESSED_FOLDER, exist_ok=True)
+
+# Initialize Login Manager
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
+# Enable CSRF Protection
+csrf = CSRFProtect(app)
+
+# Dummy user store (for example only)
+users = {}
+
+class User(UserMixin):
+    def __init__(self, id, username, password_hash):
+        self.id = id
+        self.username = username
+        self.password_hash = password_hash
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return users.get(user_id)  # username is the key now
+
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Login')
+
+class RegisterForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=3)])
+    password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Register')
 
 def sanitize_filename(name):
     """Sanitize user-provided filename."""
@@ -37,16 +81,20 @@ def clean_numeric(column):
         .str.replace(r'[^\d\.\-]', '', regex=True),
         errors='coerce'
     ).fillna(0)
+class FileUploadForm(FlaskForm):
+    filename = StringField('Filename')
+    submit = SubmitField('Process')
 
 @app.route('/', methods=['GET', 'POST'])
+@login_required
 def index():
-    if request.method == 'POST':
+    form = FileUploadForm()
+    if form.validate_on_submit():
         file = request.files.get('file_process')  
-        custom_name = request.form.get('filename', 'processed_data')
+        custom_name = form.filename.data or 'processed_data'
 
         if not file or file.filename == '':
             return "No file uploaded", 400
-
         if not file.filename.endswith('.xlsx'):
             return "Only XLSX files are allowed", 400
 
@@ -64,9 +112,10 @@ def index():
         output_path = os.path.join(app.config['PROCESSED_FOLDER'], output_filename)
         merged_df.to_excel(output_path, index=False)
 
-        return send_file(output_path, as_attachment=True, download_name=f"{safe_name}.xlsx", mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        return send_file(output_path, as_attachment=True, download_name=f"{safe_name}.xlsx",
+                         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
-    return render_template('index.html')
+    return render_template('index.html', form=form)
 
 def process_file(input_path):
     data = pd.read_excel(input_path)
@@ -95,7 +144,9 @@ def process_file(input_path):
 
     return pd.concat(final_dfs, ignore_index=True)
 
+@csrf.exempt
 @app.route('/compare', methods=['POST'])
+@login_required
 def compare_files():
     file1 = request.files.get('file1')
     file2 = request.files.get('file2')
@@ -111,7 +162,6 @@ def compare_files():
     output_folder = app.config['PROCESSED_FOLDER']
     output_files = process_comparison(filepath1, filepath2, output_folder)
 
-    # ✅ Create ZIP file
     zip_buffer = BytesIO()
     with zipfile.ZipFile(zip_buffer, 'w') as zipf:
         zipf.write(output_files["common"], arcname="common.xlsx")
@@ -133,11 +183,10 @@ def process_comparison(filepath1, filepath2, output_folder):
 
     d_common = d1.merge(d2, on="BkAcc")
     d_not_common = d1.merge(d2, on="BkAcc", how="outer", indicator=True)
-    
+
     only_in_d1 = d_not_common[d_not_common['_merge'] == 'left_only'].drop(columns=['_merge'])
     only_in_d2 = d_not_common[d_not_common['_merge'] == 'right_only'].drop(columns=['_merge'])
 
-    # ✅ Use clean_numeric to fix invalid values
     d_common['ScoBal'] = clean_numeric(d_common['SocBal'])
     d_common['BkBal'] = clean_numeric(d_common['BkBal'])
 
@@ -181,5 +230,41 @@ def format_excel(filepath, df):
 
     wb.save(filepath)
 
+
+# login ke lie 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = users.get(form.username.data)
+        if user and user.check_password(form.password.data):
+            login_user(user)
+            flash('Logged in successfully!', 'success')
+            return redirect(url_for('index'))
+        flash('Invalid credentials', 'danger')
+    return render_template('login.html', form=form)
+
+# Register
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        if form.username.data in users:
+            flash('Username already exists', 'warning')
+        else:
+            hashed_pw = generate_password_hash(form.password.data)
+            user = User(id=form.username.data, username=form.username.data, password_hash=hashed_pw)
+            users[form.username.data] = user
+            flash('Registration successful! You can now log in.', 'success')
+            return redirect(url_for('login'))
+    return render_template('register.html', form=form)
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Logged out successfully.', 'info')
+    return redirect(url_for('index'))
+
 if __name__ == '__main__':
     app.run(debug=True)
+

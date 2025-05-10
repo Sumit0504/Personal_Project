@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SheetMorph - Login</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='Log_styles.css') }}" />
+  </head>
+  <body>
+    <div class="container">
+      <form method="POST" action="{{ url_for('login') }}">
+        {{ form.hidden_tag() }}
+        <label for="username">Username:</label>
+        {{ form.username(class="input") }}
+        <label for="password">Password:</label>
+        {{ form.password(class="input") }}
+        {{ form.submit(class="login-button") }}
+        <a href="{{ url_for('register') }}" class="register-link">Don't have an account? Register</a>
+      </form>
+      
+
+      <!-- Panda design elements -->
+      <div class="ear-l"></div>
+      <div class="ear-r"></div>
+      <div class="panda-face">
+        <div class="blush-l"></div>
+        <div class="blush-r"></div>
+        <div class="eye-l">
+          <div class="eyeball-l"></div>
+        </div>
+        <div class="eye-r">
+          <div class="eyeball-r"></div>
+        </div>
+        <div class="nose"></div>
+        <div class="mouth"></div>
+      </div>
+      <div class="hand-l"></div>
+      <div class="hand-r"></div>
+      <div class="paw-l"></div>
+      <div class="paw-r"></div>
+    </div>
+    <script src="{{ url_for('static', filename='Log_script.js') }}"></script>
+  </body>
+</html>
